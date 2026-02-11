@@ -29,7 +29,7 @@ export default function NewSitePage() {
         ...formData,
         surface_area: formData.surface_area ? parseInt(formData.surface_area) : undefined,
       });
-      router.push("/sites");
+      router.push("/dashboard/sites");
     } catch {
       setIsLoading(false);
     }

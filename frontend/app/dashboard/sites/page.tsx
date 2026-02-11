@@ -20,7 +20,7 @@ export default function SitesPage() {
           <h1 className="text-3xl font-bold">Sites</h1>
           <p className="text-muted-foreground">Gérez vos bâtiments et équipements</p>
         </div>
-        <Link href="/sites/new">
+        <Link href="/dashboard/sites/new">
           <Button>Ajouter un site</Button>
         </Link>
       </div>
@@ -35,7 +35,7 @@ export default function SitesPage() {
           <p className="mt-2 text-muted-foreground">
             Commencez par ajouter votre premier bâtiment
           </p>
-          <Link href="/sites/new">
+          <Link href="/dashboard/sites/new">
             <Button className="mt-4">Ajouter un site</Button>
           </Link>
         </div>

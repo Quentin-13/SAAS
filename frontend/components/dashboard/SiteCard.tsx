@@ -19,7 +19,7 @@ const buildingTypeLabels: Record<string, string> = {
 
 export default function SiteCard({ site }: SiteCardProps) {
   return (
-    <Link href={`/sites/${site.id}`}>
+    <Link href={`/dashboard/sites/${site.id}`}>
       <Card className="hover:border-primary/50 transition-colors cursor-pointer">
         <CardContent className="p-6">
           <div className="flex items-start justify-between">
