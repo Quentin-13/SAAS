@@ -25,7 +25,7 @@ export default function RegisterPage() {
     setError("");
     try {
       await register(formData);
-      router.push("/");
+      router.push("/dashboard");
     } catch {
       setError("Erreur lors de la création du compte");
     }
