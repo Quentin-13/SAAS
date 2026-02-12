@@ -18,6 +18,7 @@ class SiteCreate(BaseModel):
     address: Optional[str] = None
     postal_code: Optional[str] = None
     city: Optional[str] = None
+    country: str = "FR"
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     surface_area: Optional[int] = None
@@ -44,6 +45,7 @@ class SiteResponse(BaseModel):
     address: Optional[str] = None
     postal_code: Optional[str] = None
     city: Optional[str] = None
+    country: str = "FR"
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     surface_area: Optional[int] = None

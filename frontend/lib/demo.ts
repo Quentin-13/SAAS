@@ -124,36 +124,48 @@ export function getDemoDashboardOverview(): DashboardOverview {
   };
 }
 
-export function getDemoSites() {
+export function getDemoSites(): import("./stores/sitesStore").Site[] {
   return [
     {
       id: "demo-site-001",
       name: "Bureau Paris 11e",
-      address: "42 rue de la Roquette, 75011 Paris",
-      area_sqm: 850,
+      address: "42 rue de la Roquette",
+      postal_code: "75011",
+      city: "Paris",
+      country: "FR",
+      latitude: 48.8566,
+      longitude: 2.3783,
+      surface_area: 850,
       building_type: "office",
       autopilot_enabled: true,
-      organization_id: "demo-org-001",
       created_at: "2024-01-15T10:00:00Z",
     },
     {
       id: "demo-site-002",
       name: "Agence Lyon Part-Dieu",
-      address: "15 boulevard Vivier Merle, 69003 Lyon",
-      area_sqm: 420,
+      address: "15 boulevard Vivier Merle",
+      postal_code: "69003",
+      city: "Lyon",
+      country: "FR",
+      latitude: 45.7602,
+      longitude: 4.8596,
+      surface_area: 420,
       building_type: "office",
       autopilot_enabled: true,
-      organization_id: "demo-org-001",
       created_at: "2024-02-01T10:00:00Z",
     },
     {
       id: "demo-site-003",
       name: "Boutique Bordeaux",
-      address: "8 cours de l'Intendance, 33000 Bordeaux",
-      area_sqm: 180,
+      address: "8 cours de l'Intendance",
+      postal_code: "33000",
+      city: "Bordeaux",
+      country: "FR",
+      latitude: 44.8378,
+      longitude: -0.5792,
+      surface_area: 180,
       building_type: "retail",
       autopilot_enabled: false,
-      organization_id: "demo-org-001",
       created_at: "2024-03-10T10:00:00Z",
     },
   ];
