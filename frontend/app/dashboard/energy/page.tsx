@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import EnergyChart from "@/components/dashboard/EnergyChart";
@@ -9,13 +9,16 @@ import { useSitesStore } from "@/lib/stores/sitesStore";
 import { formatCurrency, formatKWh } from "@/lib/utils";
 
 export default function EnergyPage() {
-  const { sites, fetchSites } = useSitesStore();
-  const { dailyAnalytics, forecasts, anomalies, fetchDailyAnalytics, fetchForecasts, fetchAnomalies } = useEnergyStore();
+  const { sites } = useSitesStore();
+  const { dailyAnalytics, forecasts, anomalies } = useEnergyStore();
   const [selectedSite, setSelectedSite] = useState<string>("");
+  const loaded = useRef(false);
 
   useEffect(() => {
-    fetchSites();
-  }, [fetchSites]);
+    if (loaded.current) return;
+    loaded.current = true;
+    useSitesStore.getState().fetchSites();
+  }, []);
 
   useEffect(() => {
     if (sites.length > 0 && !selectedSite) {
@@ -25,11 +28,12 @@ export default function EnergyPage() {
 
   useEffect(() => {
     if (selectedSite) {
-      fetchDailyAnalytics(selectedSite);
-      fetchForecasts(selectedSite);
-      fetchAnomalies(selectedSite);
+      const store = useEnergyStore.getState();
+      store.fetchDailyAnalytics(selectedSite);
+      store.fetchForecasts(selectedSite);
+      store.fetchAnomalies(selectedSite);
     }
-  }, [selectedSite, fetchDailyAnalytics, fetchForecasts, fetchAnomalies]);
+  }, [selectedSite]);
 
   return (
     <div className="space-y-6">

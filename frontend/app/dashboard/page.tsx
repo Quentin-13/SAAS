@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import MetricCard from "@/components/dashboard/MetricCard";
 import EnergyChart from "@/components/dashboard/EnergyChart";
@@ -9,11 +9,14 @@ import { useEnergyStore } from "@/lib/stores/energyStore";
 import { formatCurrency, formatKWh, formatCO2 } from "@/lib/utils";
 
 export default function DashboardPage() {
-  const { dashboardOverview, isLoading, fetchDashboardOverview } = useEnergyStore();
+  const { dashboardOverview, isLoading } = useEnergyStore();
+  const loaded = useRef(false);
 
   useEffect(() => {
-    fetchDashboardOverview();
-  }, [fetchDashboardOverview]);
+    if (loaded.current) return;
+    loaded.current = true;
+    useEnergyStore.getState().fetchDashboardOverview();
+  }, []);
 
   if (isLoading && !dashboardOverview) {
     return (

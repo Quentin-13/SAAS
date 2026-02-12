@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
@@ -8,16 +8,19 @@ import { useAuthStore } from "@/lib/stores/authStore";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { isAuthenticated, initialize } = useAuthStore();
+  const initialized = useRef(false);
 
   useEffect(() => {
-    initialize().then(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+
+    useAuthStore.getState().initialize().then(() => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         router.push("/login");
       }
     });
-  }, [initialize, router]);
+  }, [router]);
 
   return (
     <div className="flex h-screen">

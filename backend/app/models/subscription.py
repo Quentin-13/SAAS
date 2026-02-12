@@ -32,7 +32,7 @@ class Subscription(Base):
         comment="active | cancelled | expired",
     )
     monthly_price_eur = Column(Float, nullable=True)
-    start_date = Column(DateTime(timezone=True), nullable=False)
+    start_date = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     end_date = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 

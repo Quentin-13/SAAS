@@ -1,30 +1,41 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import ActionsFeed from "@/components/dashboard/ActionsFeed";
 import { useSitesStore } from "@/lib/stores/sitesStore";
-import { useEnergyStore, type AutopilotAction } from "@/lib/stores/energyStore";
+import { type AutopilotAction } from "@/lib/stores/energyStore";
+import { isDemoMode, getDemoDashboardOverview } from "@/lib/demo";
 import api from "@/lib/api";
 
 export default function AutopilotPage() {
   const { sites, fetchSites } = useSitesStore();
   const [actions, setActions] = useState<AutopilotAction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const loaded = useRef(false);
 
   useEffect(() => {
+    if (loaded.current) return;
+    loaded.current = true;
+
     fetchSites();
     loadActions();
   }, [fetchSites]);
 
   const loadActions = async () => {
+    if (isDemoMode()) {
+      const overview = getDemoDashboardOverview();
+      setActions(overview.recent_actions);
+      setIsLoading(false);
+      return;
+    }
     try {
       const response = await api.get("/autopilot/actions");
       setActions(response.data);
     } catch {
-      // ignore
+      // API not available
     } finally {
       setIsLoading(false);
     }

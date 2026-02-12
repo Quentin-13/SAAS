@@ -1,17 +1,20 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import SiteCard from "@/components/dashboard/SiteCard";
 import { useSitesStore } from "@/lib/stores/sitesStore";
 
 export default function SitesPage() {
-  const { sites, isLoading, fetchSites } = useSitesStore();
+  const { sites, isLoading } = useSitesStore();
+  const loaded = useRef(false);
 
   useEffect(() => {
-    fetchSites();
-  }, [fetchSites]);
+    if (loaded.current) return;
+    loaded.current = true;
+    useSitesStore.getState().fetchSites();
+  }, []);
 
   return (
     <div className="space-y-6">

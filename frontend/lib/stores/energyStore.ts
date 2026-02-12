@@ -61,6 +61,7 @@ interface EnergyState {
   anomalies: Anomaly[];
   dashboardOverview: DashboardOverview | null;
   isLoading: boolean;
+  error: string | null;
   fetchDailyAnalytics: (siteId: string, startDate?: string, endDate?: string) => Promise<void>;
   fetchForecasts: (siteId: string) => Promise<void>;
   fetchAnomalies: (siteId: string) => Promise<void>;
@@ -73,9 +74,15 @@ export const useEnergyStore = create<EnergyState>((set) => ({
   anomalies: [],
   dashboardOverview: null,
   isLoading: false,
+  error: null,
 
   fetchDailyAnalytics: async (siteId, startDate, endDate) => {
-    set({ isLoading: true });
+    if (isDemoMode()) {
+      const overview = getDemoDashboardOverview();
+      set({ dailyAnalytics: overview.daily_consumption, isLoading: false, error: null });
+      return;
+    }
+    set({ isLoading: true, error: null });
     try {
       const params: Record<string, string> = { site_id: siteId };
       if (startDate) params.start_date = startDate;
@@ -83,41 +90,49 @@ export const useEnergyStore = create<EnergyState>((set) => ({
       const response = await api.get("/energy/analytics/daily", { params });
       set({ dailyAnalytics: response.data, isLoading: false });
     } catch {
-      set({ isLoading: false });
+      set({ error: "Erreur de chargement des analytics", isLoading: false });
     }
   },
 
   fetchForecasts: async (siteId) => {
-    set({ isLoading: true });
+    if (isDemoMode()) {
+      set({ forecasts: [], isLoading: false, error: null });
+      return;
+    }
+    set({ isLoading: true, error: null });
     try {
       const response = await api.get("/energy/forecast", { params: { site_id: siteId } });
       set({ forecasts: response.data, isLoading: false });
     } catch {
-      set({ isLoading: false });
+      set({ error: "Erreur de chargement des prévisions", isLoading: false });
     }
   },
 
   fetchAnomalies: async (siteId) => {
-    set({ isLoading: true });
+    if (isDemoMode()) {
+      set({ anomalies: [], isLoading: false, error: null });
+      return;
+    }
+    set({ isLoading: true, error: null });
     try {
       const response = await api.get("/energy/anomalies", { params: { site_id: siteId } });
       set({ anomalies: response.data, isLoading: false });
     } catch {
-      set({ isLoading: false });
+      set({ error: "Erreur de chargement des anomalies", isLoading: false });
     }
   },
 
   fetchDashboardOverview: async () => {
     if (isDemoMode()) {
-      set({ dashboardOverview: getDemoDashboardOverview(), isLoading: false });
+      set({ dashboardOverview: getDemoDashboardOverview(), isLoading: false, error: null });
       return;
     }
-    set({ isLoading: true });
+    set({ isLoading: true, error: null });
     try {
       const response = await api.get("/dashboard/overview");
       set({ dashboardOverview: response.data, isLoading: false });
     } catch {
-      set({ isLoading: false });
+      set({ error: "Erreur de chargement du dashboard", isLoading: false });
     }
   },
 }));

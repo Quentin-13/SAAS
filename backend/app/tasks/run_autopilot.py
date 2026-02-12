@@ -26,7 +26,11 @@ def run_autopilot_cycle(self):
                 engine = AutopilotEngine(db)
                 # Run synchronously in Celery context
                 import asyncio
-                actions = asyncio.get_event_loop().run_until_complete(engine.run(str(site.id)))
+                loop = asyncio.new_event_loop()
+                try:
+                    actions = loop.run_until_complete(engine.run(str(site.id)))
+                finally:
+                    loop.close()
                 action_count = len(actions) if actions else 0
                 total_actions += action_count
                 logger.info(
