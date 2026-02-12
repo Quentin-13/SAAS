@@ -30,20 +30,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
         Base.metadata.create_all(bind=engine)
         logger.info("Database tables created/verified")
 
-        # Auto-seed if database is empty
-        db = SessionLocal()
+        # Auto-seed or refresh demo data
         try:
-            from app.models.user import User as UserModel
-            if not db.query(UserModel).first():
-                logger.info("Empty database detected, running seed...")
-                db.close()
-                from seed_data import seed
-                seed()
-                logger.info("Demo data seeded successfully")
-            else:
-                db.close()
+            from seed_data import seed
+            seed()
+            logger.info("Seed check completed successfully")
         except Exception as e:
-            db.close()
             logger.warning("Could not check/seed database: %s", e)
     except Exception as e:
         logger.warning("Could not initialize database: %s", e)

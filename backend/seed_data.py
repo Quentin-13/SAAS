@@ -20,7 +20,14 @@ def seed():
     try:
         # Check if data already exists
         if db.query(User).first():
-            print("Database already seeded. Skipping.")
+            # Ensure demo user password is valid (fixes passlib/bcrypt compat issue)
+            demo_user = db.query(User).filter(User.email == "demo@energy-autopilot.fr").first()
+            if demo_user:
+                demo_user.hashed_password = get_password_hash("demo1234")
+                db.commit()
+                print("Database already seeded. Demo user password refreshed.")
+            else:
+                print("Database already seeded. Skipping.")
             return
 
         # Organization

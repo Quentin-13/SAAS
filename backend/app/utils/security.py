@@ -1,31 +1,35 @@
 """
 Security utilities for password hashing and field-level encryption.
 
-Password hashing uses bcrypt via passlib. Symmetric encryption of API
+Password hashing uses bcrypt directly. Symmetric encryption of API
 credentials (OAuth tokens, third-party keys stored in the database)
 uses Fernet, whose key is sourced from the application configuration.
 """
 
 from __future__ import annotations
 
+import bcrypt
 from cryptography.fernet import Fernet, InvalidToken
-from passlib.context import CryptContext
 
 from app.config import settings
 
 # ── Password hashing ─────────────────────────────────────────────────────
 
-_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Return ``True`` if *plain_password* matches the stored bcrypt hash."""
-    return _pwd_context.verify(plain_password, hashed_password)
+    return bcrypt.checkpw(
+        plain_password.encode("utf-8"),
+        hashed_password.encode("utf-8"),
+    )
 
 
 def get_password_hash(password: str) -> str:
     """Return a bcrypt hash of *password*."""
-    return _pwd_context.hash(password)
+    return bcrypt.hashpw(
+        password.encode("utf-8"),
+        bcrypt.gensalt(),
+    ).decode("utf-8")
 
 
 # ── Fernet encryption for API credentials ────────────────────────────────
