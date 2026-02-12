@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { User, login as authLogin, register as authRegister, getUser, logout as authLogout } from "../auth";
+import { isDemoMode, enableDemoMode, disableDemoMode, DEMO_USER } from "../demo";
 
 interface AuthState {
   user: User | null;
@@ -7,6 +8,7 @@ interface AuthState {
   isAuthenticated: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
+  loginDemo: () => void;
   register: (data: { email: string; password: string; full_name: string; organization_name: string }) => Promise<void>;
   logout: () => void;
   fetchUser: () => Promise<void>;
@@ -32,6 +34,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
+  loginDemo: () => {
+    enableDemoMode();
+    set({ user: DEMO_USER, isAuthenticated: true, isLoading: false });
+  },
+
   register: async (data) => {
     set({ isLoading: true, error: null });
     try {
@@ -46,11 +53,16 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: () => {
+    disableDemoMode();
     authLogout();
     set({ user: null, isAuthenticated: false });
   },
 
   fetchUser: async () => {
+    if (isDemoMode()) {
+      set({ user: DEMO_USER, isAuthenticated: true, isLoading: false });
+      return;
+    }
     set({ isLoading: true });
     try {
       const user = await getUser();
@@ -62,6 +74,10 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   initialize: async () => {
     if (typeof window === "undefined") return;
+    if (isDemoMode()) {
+      set({ user: DEMO_USER, isAuthenticated: true });
+      return;
+    }
     const token = localStorage.getItem("access_token");
     if (token) {
       try {

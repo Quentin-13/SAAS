@@ -1,6 +1,17 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/lib/stores/authStore";
 
 export default function LandingPage() {
+  const router = useRouter();
+  const { loginDemo } = useAuthStore();
+
+  const handleDemo = () => {
+    loginDemo();
+    router.push("/dashboard");
+  };
   return (
     <div className="min-h-screen bg-background">
       {/* Nav */}
@@ -48,12 +59,12 @@ export default function LandingPage() {
             >
               Essai gratuit
             </Link>
-            <Link
-              href="#features"
-              className="rounded-lg border border-border px-8 py-3 text-lg font-semibold hover:bg-accent transition"
+            <button
+              onClick={handleDemo}
+              className="rounded-lg border border-border px-8 py-3 text-lg font-semibold hover:bg-accent transition cursor-pointer"
             >
               Voir la démo
-            </Link>
+            </button>
           </div>
         </div>
       </section>

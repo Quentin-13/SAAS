@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import api from "../api";
+import { isDemoMode, getDemoSites } from "../demo";
 
 export interface Site {
   id: string;
@@ -38,6 +39,10 @@ export const useSitesStore = create<SitesState>((set, get) => ({
   error: null,
 
   fetchSites: async () => {
+    if (isDemoMode()) {
+      set({ sites: getDemoSites() as Site[], isLoading: false });
+      return;
+    }
     set({ isLoading: true });
     try {
       const response = await api.get("/sites/");

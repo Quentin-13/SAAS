@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import api from "../api";
+import { isDemoMode, getDemoDashboardOverview } from "../demo";
 
 export interface DailyAnalytics {
   date: string;
@@ -107,6 +108,10 @@ export const useEnergyStore = create<EnergyState>((set) => ({
   },
 
   fetchDashboardOverview: async () => {
+    if (isDemoMode()) {
+      set({ dashboardOverview: getDemoDashboardOverview(), isLoading: false });
+      return;
+    }
     set({ isLoading: true });
     try {
       const response = await api.get("/dashboard/overview");
