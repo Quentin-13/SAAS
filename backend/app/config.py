@@ -8,8 +8,16 @@ variables or a .env file located at the project root.
 
 from __future__ import annotations
 
+import logging
+
+from cryptography.fernet import Fernet
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_logger = logging.getLogger(__name__)
+
+# Generate a stable default Fernet key for development environments
+_DEFAULT_FERNET_KEY = Fernet.generate_key().decode()
 
 
 class Settings(BaseSettings):
@@ -28,13 +36,13 @@ class Settings(BaseSettings):
     DEBUG: bool = False
 
     # ── Security / Auth ─────────────────────────────────────────────────
-    SECRET_KEY: str
+    SECRET_KEY: str = "dev-secret-key-change-in-production-abc123"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
-    ENCRYPTION_KEY: str  # Fernet-compatible key for field-level encryption
+    ENCRYPTION_KEY: str = _DEFAULT_FERNET_KEY  # Fernet-compatible key for field-level encryption
 
     # ── Database (TimescaleDB / PostgreSQL) ─────────────────────────────
-    DATABASE_URL: str  # e.g. postgresql://user:pass@localhost:5432/energy
+    DATABASE_URL: str = "postgresql://user:password@postgres:5432/energy_autopilot"
 
     # ── Redis / Celery ──────────────────────────────────────────────────
     REDIS_URL: str = "redis://localhost:6379/0"

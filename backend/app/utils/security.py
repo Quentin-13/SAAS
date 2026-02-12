@@ -34,7 +34,19 @@ def get_password_hash(password: str) -> str:
 
 # ── Fernet encryption for API credentials ────────────────────────────────
 
-_fernet = Fernet(settings.ENCRYPTION_KEY.encode())
+import logging as _logging
+
+_security_logger = _logging.getLogger(__name__)
+
+try:
+    _fernet = Fernet(settings.ENCRYPTION_KEY.encode())
+except (ValueError, Exception) as _exc:
+    _security_logger.warning(
+        "Invalid ENCRYPTION_KEY (%s). Generating a temporary key. "
+        "Set a valid Fernet key in .env for production.",
+        _exc,
+    )
+    _fernet = Fernet(Fernet.generate_key())
 
 
 def encrypt_data(plaintext: str) -> str:
