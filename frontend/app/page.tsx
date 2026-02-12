@@ -24,6 +24,18 @@ export default function LandingPage() {
             <span className="text-xl font-bold">Energy Autopilot</span>
           </div>
           <div className="flex items-center gap-4">
+            <a
+              href="#how-it-works"
+              className="text-sm text-muted-foreground hover:text-foreground transition"
+            >
+              Comment ça marche
+            </a>
+            <a
+              href="#pricing"
+              className="text-sm text-muted-foreground hover:text-foreground transition"
+            >
+              Tarifs
+            </a>
             <Link
               href="/login"
               className="text-sm text-muted-foreground hover:text-foreground transition"
@@ -69,13 +81,72 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features */}
-      <section id="features" className="px-6 py-24 bg-card/50">
+      {/* Comment ça marche — detailed */}
+      <section id="how-it-works" className="px-6 py-24 bg-card/50">
         <div className="mx-auto max-w-7xl">
-          <h2 className="text-3xl font-bold text-center mb-16">
+          <h2 className="text-3xl font-bold text-center mb-4">
             Comment ça marche
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <p className="text-center text-muted-foreground mb-16 max-w-2xl mx-auto">
+            En 4 étapes simples, passez d&apos;une gestion manuelle à un pilotage
+            intelligent de votre énergie
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Step 1 */}
+            <div className="relative text-center">
+              <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <span className="text-2xl font-bold text-primary">1</span>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Connectez vos équipements</h3>
+              <p className="text-sm text-muted-foreground">
+                Reliez vos compteurs Linky, thermostats Nest, capteurs Netatmo
+                en quelques clics. Aucune installation physique nécessaire.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="relative text-center">
+              <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <span className="text-2xl font-bold text-primary">2</span>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">L&apos;IA analyse vos données</h3>
+              <p className="text-sm text-muted-foreground">
+                Notre intelligence artificielle étudie vos historiques de
+                consommation, la météo locale et les tarifs énergétiques pour
+                créer un profil optimisé.
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="relative text-center">
+              <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <span className="text-2xl font-bold text-primary">3</span>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">L&apos;Autopilot optimise</h3>
+              <p className="text-sm text-muted-foreground">
+                L&apos;autopilot ajuste automatiquement vos équipements toutes
+                les 15 minutes : chauffage, climatisation, éclairage — tout en
+                respectant vos contraintes de confort.
+              </p>
+            </div>
+
+            {/* Step 4 */}
+            <div className="relative text-center">
+              <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <span className="text-2xl font-bold text-primary">4</span>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Suivez vos économies</h3>
+              <p className="text-sm text-muted-foreground">
+                Visualisez en temps réel vos économies, les actions de
+                l&apos;autopilot et gardez le contrôle total depuis votre
+                dashboard.
+              </p>
+            </div>
+          </div>
+
+          {/* Feature highlights */}
+          <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="rounded-xl border border-border bg-card p-8">
               <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                 <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -125,13 +196,14 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing */}
-      <section className="px-6 py-24">
+      <section id="pricing" className="px-6 py-24">
         <div className="mx-auto max-w-7xl">
           <h2 className="text-3xl font-bold text-center mb-4">Tarifs</h2>
           <p className="text-center text-muted-foreground mb-16">
             Des formules adaptées à la taille de votre entreprise
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Starter — now includes AI */}
             <div className="rounded-xl border border-border p-8">
               <h3 className="text-lg font-semibold">Starter</h3>
               <p className="text-3xl font-bold mt-4">
@@ -151,7 +223,15 @@ export default function LandingPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <svg className="h-4 w-4 text-primary" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                  Autopilot basique
+                  Autopilot intelligent
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg className="h-4 w-4 text-primary" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  IA prédictive incluse
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg className="h-4 w-4 text-primary" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  Dashboard temps réel
                 </li>
               </ul>
               <Link
@@ -162,6 +242,7 @@ export default function LandingPage() {
               </Link>
             </div>
 
+            {/* Pro — enriched */}
             <div className="rounded-xl border-2 border-primary p-8 relative">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full">
                 Populaire
@@ -184,7 +265,19 @@ export default function LandingPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <svg className="h-4 w-4 text-primary" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                  Autopilot avancé + IA
+                  IA avancée + prévisions 7 jours
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg className="h-4 w-4 text-primary" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  Autopilot multi-zones
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg className="h-4 w-4 text-primary" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  Détection d&apos;anomalies avancée
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg className="h-4 w-4 text-primary" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  Rapports mensuels automatiques
                 </li>
                 <li className="flex items-center gap-2">
                   <svg className="h-4 w-4 text-primary" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
@@ -199,6 +292,7 @@ export default function LandingPage() {
               </Link>
             </div>
 
+            {/* Enterprise */}
             <div className="rounded-xl border border-border p-8">
               <h3 className="text-lg font-semibold">Enterprise</h3>
               <p className="text-3xl font-bold mt-4">Sur devis</p>
@@ -220,7 +314,15 @@ export default function LandingPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <svg className="h-4 w-4 text-primary" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                  Account manager
+                  Account manager dédié
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg className="h-4 w-4 text-primary" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  SLA garanti 99.9%
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg className="h-4 w-4 text-primary" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  Intégrations sur mesure
                 </li>
               </ul>
               <Link
