@@ -39,24 +39,21 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
 
     # ── CORS ────────────────────────────────────────────────────────────
-    ALLOWED_ORIGINS: list[str] = ["http://localhost:3000"]
+    ALLOWED_ORIGINS: str = "http://localhost:3000"
 
-    @field_validator("ALLOWED_ORIGINS", mode="before")
-    @classmethod
-    def _parse_origins(cls, v: str | list[str]) -> list[str]:
-        """Accept a comma-separated string, a JSON array, or an already-parsed list."""
-        if isinstance(v, str):
-            v = v.strip()
-            if v.startswith("["):
-                import json
-                try:
-                    parsed = json.loads(v)
-                    if isinstance(parsed, list):
-                        return [str(o).strip() for o in parsed if str(o).strip()]
-                except (json.JSONDecodeError, ValueError):
-                    pass
-            return [origin.strip() for origin in v.split(",") if origin.strip()]
-        return v
+    @property
+    def allowed_origins_list(self) -> list[str]:
+        """Parse ALLOWED_ORIGINS into a list. Supports comma-separated and JSON array formats."""
+        import json
+        v = self.ALLOWED_ORIGINS.strip()
+        if v.startswith("["):
+            try:
+                parsed = json.loads(v)
+                if isinstance(parsed, list):
+                    return [str(o).strip() for o in parsed if str(o).strip()]
+            except (json.JSONDecodeError, ValueError):
+                pass
+        return [origin.strip() for origin in v.split(",") if origin.strip()]
 
     # ── External API keys ───────────────────────────────────────────────
     MOCK_APIS: bool = True  # When True, external calls return fake data

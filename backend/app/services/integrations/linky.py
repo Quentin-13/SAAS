@@ -57,7 +57,7 @@ class LinkyClient(BaseIntegration):
                 "grant_type": "authorization_code",
                 "code": authorization_code,
                 "client_id": settings.ENEDIS_API_KEY,
-                "redirect_uri": f"{settings.ALLOWED_ORIGINS[0]}/callback/enedis",
+                "redirect_uri": f"{settings.allowed_origins_list[0]}/callback/enedis",
             },
             headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
