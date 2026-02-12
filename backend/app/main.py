@@ -1,6 +1,5 @@
 """Energy Autopilot API - Main FastAPI application."""
 import logging
-import json
 from contextlib import asynccontextmanager
 from datetime import datetime
 from typing import AsyncGenerator
@@ -23,6 +22,31 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
     """Application lifespan events."""
     # Startup
     logger.info("Starting %s v%s", settings.APP_NAME, settings.APP_VERSION)
+
+    # Auto-create tables and seed demo data
+    try:
+        from app.database import engine, Base, SessionLocal
+        import app.models  # noqa: F401 — ensure all models are registered
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database tables created/verified")
+
+        # Auto-seed if database is empty
+        db = SessionLocal()
+        try:
+            from app.models.user import User as UserModel
+            if not db.query(UserModel).first():
+                logger.info("Empty database detected, running seed...")
+                db.close()
+                from seed_data import seed
+                seed()
+                logger.info("Demo data seeded successfully")
+            else:
+                db.close()
+        except Exception as e:
+            db.close()
+            logger.warning("Could not check/seed database: %s", e)
+    except Exception as e:
+        logger.warning("Could not initialize database: %s", e)
 
     # Initialize Sentry if configured
     if settings.SENTRY_DSN:
