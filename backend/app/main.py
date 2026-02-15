@@ -30,6 +30,38 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
         Base.metadata.create_all(bind=engine)
         logger.info("Database tables created/verified")
 
+        # Apply schema migrations for columns added after initial create_all
+        from sqlalchemy import text, inspect as sa_inspect
+        with engine.connect() as conn:
+            inspector = sa_inspect(engine)
+
+            # Add 'role' column to users if missing
+            user_cols = [c["name"] for c in inspector.get_columns("users")]
+            if "role" not in user_cols:
+                conn.execute(text(
+                    "ALTER TABLE users ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'user'"
+                ))
+                conn.execute(text(
+                    "UPDATE users SET role = 'admin' WHERE is_superuser = true"
+                ))
+                conn.commit()
+                logger.info("Added 'role' column to users table")
+
+            # Add stripe fields to subscriptions if missing
+            sub_cols = [c["name"] for c in inspector.get_columns("subscriptions")]
+            if "stripe_customer_id" not in sub_cols:
+                conn.execute(text(
+                    "ALTER TABLE subscriptions ADD COLUMN stripe_customer_id VARCHAR(255)"
+                ))
+                conn.commit()
+                logger.info("Added 'stripe_customer_id' column to subscriptions table")
+            if "stripe_subscription_id" not in sub_cols:
+                conn.execute(text(
+                    "ALTER TABLE subscriptions ADD COLUMN stripe_subscription_id VARCHAR(255)"
+                ))
+                conn.commit()
+                logger.info("Added 'stripe_subscription_id' column to subscriptions table")
+
         # Auto-seed or refresh demo data
         try:
             from seed_data import seed
