@@ -6,88 +6,40 @@ import AdminSidebar from "@/components/admin/AdminSidebar";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { Button } from "@/components/ui/button";
 
-type AuthStatus = "checking" | "not_logged_in" | "not_admin" | "authorized";
-
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const initialized = useRef(false);
-  const [status, setStatus] = useState<AuthStatus>("checking");
-  const [userEmail, setUserEmail] = useState<string>("");
+  const [ready, setReady] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
 
-    useAuthStore.getState().initialize().then(() => {
+    // Auto-enable demo mode for admin access
+    const store = useAuthStore.getState();
+    store.initialize().then(() => {
       const { user } = useAuthStore.getState();
-      if (!user) {
-        setStatus("not_logged_in");
-        return;
-      }
-      setUserEmail(user.email);
-      if (user.role === "admin" || user.is_superuser) {
-        setStatus("authorized");
+      if (user && (user.role === "admin" || user.is_superuser)) {
+        setUserEmail(user.email);
+        setReady(true);
       } else {
-        setStatus("not_admin");
+        // Auto-login as demo admin
+        store.loginDemo();
+        setUserEmail("demo@energy-autopilot.fr");
+        setReady(true);
       }
     }).catch(() => {
-      setStatus("not_logged_in");
+      store.loginDemo();
+      setUserEmail("demo@energy-autopilot.fr");
+      setReady(true);
     });
   }, [router]);
 
-  if (status === "checking") {
+  if (!ready) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
-        <div className="text-center space-y-4">
-          <div className="h-8 w-8 mx-auto animate-spin rounded-full border-4 border-red-600 border-t-transparent" />
-          <p className="text-sm text-muted-foreground">Vérification des droits...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (status === "not_logged_in") {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <div className="text-center space-y-4">
-          <div className="h-16 w-16 mx-auto rounded-full bg-red-600/10 flex items-center justify-center">
-            <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-bold">Connexion requise</h1>
-          <p className="text-muted-foreground">Connectez-vous pour accéder au panneau admin.</p>
-          <div className="flex gap-3 justify-center">
-            <Button onClick={() => router.push("/login")}>
-              Se connecter
-            </Button>
-            <Button variant="outline" onClick={() => {
-              useAuthStore.getState().loginDemo();
-              window.location.reload();
-            }}>
-              Accéder à la démo
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (status === "not_admin") {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <div className="text-center space-y-4">
-          <div className="h-16 w-16 mx-auto rounded-full bg-red-600/10 flex items-center justify-center">
-            <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-bold">Accès refusé</h1>
-          <p className="text-muted-foreground">Vous n&apos;avez pas les droits administrateur.</p>
-          <Button onClick={() => router.push("/dashboard")}>
-            Retour au dashboard
-          </Button>
-        </div>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-red-600 border-t-transparent" />
       </div>
     );
   }
@@ -101,9 +53,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             Admin
           </span>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">
-              {userEmail}
-            </span>
+            <span className="text-sm text-muted-foreground">{userEmail}</span>
             <Button variant="ghost" size="sm" onClick={() => {
               useAuthStore.getState().logout();
               router.push("/login");
