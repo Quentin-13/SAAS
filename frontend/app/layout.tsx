@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ToastProvider } from "@/components/shared/ToastProvider";
 
 export const metadata: Metadata = {
   title: "Energy Autopilot",
@@ -14,7 +15,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" className="dark">
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        {children}
+        <ToastProvider />
+      </body>
     </html>
   );
 }

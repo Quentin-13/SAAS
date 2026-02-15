@@ -20,11 +20,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       const { user } = useAuthStore.getState();
       if (!user) {
         router.push("/login");
+        setChecking(false);
         return;
       }
       if (user.role === "admin" || user.is_superuser) {
         setAuthorized(true);
       }
+      setChecking(false);
+    }).catch(() => {
       setChecking(false);
     });
   }, [router]);

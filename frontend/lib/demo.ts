@@ -14,6 +14,8 @@ export const DEMO_USER: User = {
   full_name: "Jean Dupont",
   phone: "+33 6 12 34 56 78",
   is_active: true,
+  is_superuser: true,
+  role: "admin",
   organization_id: "demo-org-001",
   created_at: "2024-01-15T10:00:00Z",
 };
