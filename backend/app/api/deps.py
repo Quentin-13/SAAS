@@ -90,3 +90,21 @@ def get_current_active_user(
             detail="Inactive user account.",
         )
     return current_user
+
+
+def get_current_admin_user(
+    current_user: User = Depends(get_current_active_user),
+) -> User:
+    """Return the current user only if they have admin role.
+
+    Raises
+    ------
+    HTTPException 403
+        If the user is not an admin.
+    """
+    if getattr(current_user, "role", "user") != "admin" and not current_user.is_superuser:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required.",
+        )
+    return current_user

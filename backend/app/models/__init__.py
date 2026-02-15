@@ -5,6 +5,7 @@ Alembic (or any other tool) inspects it.
 """
 
 from app.models.action import AutopilotAction
+from app.models.activity_log import ActivityLog
 from app.models.device import Device
 from app.models.energy import EnergyForecast, EnergyReading
 from app.models.site import Site, Zone
@@ -12,6 +13,7 @@ from app.models.subscription import Subscription
 from app.models.user import Organization, User
 
 __all__ = [
+    "ActivityLog",
     "AutopilotAction",
     "Device",
     "EnergyForecast",

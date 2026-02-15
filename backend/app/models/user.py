@@ -48,6 +48,8 @@ class User(Base):
     phone = Column(String(50), nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
     is_superuser = Column(Boolean, default=False, nullable=False)
+    role = Column(String(20), nullable=False, default="user", server_default="user",
+                  comment="user | admin")
     organization_id = Column(
         String(36),
         ForeignKey("organizations.id", ondelete="SET NULL"),

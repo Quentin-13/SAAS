@@ -6,6 +6,8 @@ export interface User {
   full_name: string | null;
   phone: string | null;
   is_active: boolean;
+  is_superuser?: boolean;
+  role?: string;
   organization_id: string | null;
   created_at: string;
 }

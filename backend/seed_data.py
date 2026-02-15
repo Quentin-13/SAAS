@@ -20,14 +20,37 @@ def seed():
     try:
         # Check if data already exists
         if db.query(User).first():
-            # Ensure demo user password is valid (fixes passlib/bcrypt compat issue)
+            # Ensure demo user password is valid
             demo_user = db.query(User).filter(User.email == "demo@energy-autopilot.fr").first()
             if demo_user:
                 demo_user.hashed_password = get_password_hash("demo1234")
-                db.commit()
-                print("Database already seeded. Demo user password refreshed.")
+
+            # Ensure admin user exists
+            admin_user = db.query(User).filter(User.email == "admin@energy-autopilot.fr").first()
+            if not admin_user:
+                admin_org = db.query(Organization).first()
+                admin_user = User(
+                    id=str(uuid.uuid4()),
+                    email="admin@energy-autopilot.fr",
+                    hashed_password=get_password_hash("admin123"),
+                    full_name="Admin Energy",
+                    is_active=True,
+                    is_superuser=True,
+                    organization_id=admin_org.id if admin_org else None,
+                )
+                if hasattr(User, "role"):
+                    admin_user.role = "admin"
+                db.add(admin_user)
+                print("Admin user created: admin@energy-autopilot.fr (password: admin123)")
             else:
-                print("Database already seeded. Skipping.")
+                admin_user.hashed_password = get_password_hash("admin123")
+                admin_user.is_superuser = True
+                if hasattr(User, "role"):
+                    admin_user.role = "admin"
+                print("Admin user password refreshed.")
+
+            db.commit()
+            print("Database already seeded. Passwords refreshed.")
             return
 
         # Organization
@@ -51,6 +74,21 @@ def seed():
             organization_id=org.id,
         )
         db.add(user)
+        db.flush()
+
+        # Admin user
+        admin_user = User(
+            id=str(uuid.uuid4()),
+            email="admin@energy-autopilot.fr",
+            hashed_password=get_password_hash("admin123"),
+            full_name="Admin Energy",
+            is_active=True,
+            is_superuser=True,
+            organization_id=org.id,
+        )
+        if hasattr(User, "role"):
+            admin_user.role = "admin"
+        db.add(admin_user)
         db.flush()
 
         # Subscription

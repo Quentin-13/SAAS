@@ -25,6 +25,8 @@ class UserResponse(BaseModel):
     full_name: Optional[str] = None
     phone: Optional[str] = None
     is_active: bool
+    is_superuser: bool = False
+    role: str = "user"
     organization_id: Optional[str] = None
     created_at: datetime
 
