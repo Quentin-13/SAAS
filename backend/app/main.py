@@ -1,11 +1,13 @@
 """Energy Autopilot API - Main FastAPI application."""
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 from datetime import datetime
 from typing import AsyncGenerator
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.config import settings
 
@@ -96,11 +98,49 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="Plateforme de gestion énergétique prédictive avec autopilot IA",
+    description="Plateforme de gestion energetique predictive avec autopilot IA",
     docs_url="/docs",
     redoc_url="/redoc",
     lifespan=lifespan,
 )
+
+# ── Rate limiting middleware ────────────────────────────────────────────
+# Simple in-memory rate limiter (per-IP, sliding window)
+
+_rate_limit_store: dict[str, list[float]] = {}
+
+
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    """Simple per-IP rate limiter. Skips health checks and webhooks."""
+    # Skip rate limiting for health, docs, and webhook endpoints
+    path = request.url.path
+    if path in ("/health", "/readiness", "/docs", "/redoc", "/openapi.json"):
+        return await call_next(request)
+    if path.endswith("/webhook"):
+        return await call_next(request)
+
+    client_ip = request.client.host if request.client else "unknown"
+    now = datetime.utcnow().timestamp()
+    window = 60.0  # 1 minute
+    max_requests = settings.RATE_LIMIT_PER_MINUTE
+
+    # Clean old entries and check limit
+    timestamps = _rate_limit_store.get(client_ip, [])
+    timestamps = [t for t in timestamps if now - t < window]
+
+    if len(timestamps) >= max_requests:
+        return JSONResponse(
+            status_code=429,
+            content={"detail": "Too many requests. Please try again later."},
+            headers={"Retry-After": "60"},
+        )
+
+    timestamps.append(now)
+    _rate_limit_store[client_ip] = timestamps
+
+    return await call_next(request)
+
 
 # CORS
 app.add_middleware(
@@ -119,6 +159,7 @@ from app.api.v1.energy import router as energy_router
 from app.api.v1.autopilot import router as autopilot_router
 from app.api.v1.dashboard import router as dashboard_router
 from app.api.v1.admin import router as admin_router
+from app.api.v1.billing import router as billing_router
 
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(sites_router, prefix="/api/v1")
@@ -127,6 +168,7 @@ app.include_router(energy_router, prefix="/api/v1")
 app.include_router(autopilot_router, prefix="/api/v1")
 app.include_router(dashboard_router, prefix="/api/v1")
 app.include_router(admin_router, prefix="/api/v1")
+app.include_router(billing_router, prefix="/api/v1")
 
 
 @app.get("/health", tags=["system"])
@@ -172,7 +214,9 @@ async def readiness_check():
     }
 
 
-# WebSocket connections manager
+# ── WebSocket connections manager ────────────────────────────────────────
+
+
 class ConnectionManager:
     """Manages WebSocket connections for real-time dashboard updates."""
 
@@ -185,7 +229,8 @@ class ConnectionManager:
         logger.info("WebSocket connected. Total: %d", len(self.active_connections))
 
     def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+        if websocket in self.active_connections:
+            self.active_connections.remove(websocket)
         logger.info("WebSocket disconnected. Total: %d", len(self.active_connections))
 
     async def broadcast(self, message: dict):
@@ -197,7 +242,15 @@ class ConnectionManager:
             except Exception:
                 disconnected.append(connection)
         for conn in disconnected:
-            self.active_connections.remove(conn)
+            if conn in self.active_connections:
+                self.active_connections.remove(conn)
+
+    async def send_personal(self, websocket: WebSocket, message: dict):
+        """Send a message to a specific client."""
+        try:
+            await websocket.send_json(message)
+        except Exception:
+            self.disconnect(websocket)
 
 
 manager = ConnectionManager()
@@ -205,9 +258,36 @@ manager = ConnectionManager()
 
 @app.websocket("/ws/dashboard")
 async def websocket_dashboard(websocket: WebSocket):
-    """WebSocket endpoint for real-time dashboard updates."""
+    """WebSocket endpoint for real-time dashboard updates.
+
+    Sends periodic energy snapshots and responds to heartbeat pings.
+    """
     await manager.connect(websocket)
     try:
+        # Start a background task to push energy data every 30 seconds
+        async def push_energy_updates():
+            """Push simulated real-time energy data to the client."""
+            import random
+            while True:
+                await asyncio.sleep(30)
+                hour = datetime.utcnow().hour
+                is_business = 8 <= hour <= 19
+                base_power = random.gauss(8, 1.5) if is_business else random.gauss(3, 0.8)
+                base_power = max(0.5, base_power)
+
+                await manager.send_personal(websocket, {
+                    "type": "energy_update",
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "data": {
+                        "power_kw": round(base_power, 2),
+                        "energy_kwh_today": round(base_power * hour * 0.25, 1),
+                        "cost_eur_today": round(base_power * hour * 0.25 * 0.22, 2),
+                        "co2_kg_today": round(base_power * hour * 0.25 * 0.057, 2),
+                    },
+                })
+
+        push_task = asyncio.create_task(push_energy_updates())
+
         while True:
             data = await websocket.receive_text()
             # Echo back with timestamp for heartbeat
@@ -218,3 +298,5 @@ async def websocket_dashboard(websocket: WebSocket):
             })
     except WebSocketDisconnect:
         manager.disconnect(websocket)
+    finally:
+        push_task.cancel()

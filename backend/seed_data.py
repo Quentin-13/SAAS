@@ -20,10 +20,13 @@ def seed():
     try:
         # Check if data already exists
         if db.query(User).first():
-            # Ensure demo user password is valid
+            # Ensure demo user password is valid and has admin role
             demo_user = db.query(User).filter(User.email == "demo@energy-autopilot.fr").first()
             if demo_user:
                 demo_user.hashed_password = get_password_hash("demo1234")
+                demo_user.is_superuser = True
+                if hasattr(User, "role"):
+                    demo_user.role = "admin"
 
             # Ensure admin user exists
             admin_user = db.query(User).filter(User.email == "admin@energy-autopilot.fr").first()
@@ -63,7 +66,7 @@ def seed():
         db.add(org)
         db.flush()
 
-        # User
+        # User (demo user is also admin so /admin auto-login works)
         user = User(
             id=str(uuid.uuid4()),
             email="demo@energy-autopilot.fr",
@@ -71,8 +74,11 @@ def seed():
             full_name="Jean Dupont",
             phone="+33 6 12 34 56 78",
             is_active=True,
+            is_superuser=True,
             organization_id=org.id,
         )
+        if hasattr(User, "role"):
+            user.role = "admin"
         db.add(user)
         db.flush()
 

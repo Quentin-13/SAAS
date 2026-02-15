@@ -98,5 +98,17 @@ class Settings(BaseSettings):
     SMTP_FROM_EMAIL: str = "noreply@energy-saas.local"
     SMTP_TLS: bool = True
 
+    # ── Stripe ────────────────────────────────────────────────────────────
+    STRIPE_SECRET_KEY: str = ""
+    STRIPE_PUBLISHABLE_KEY: str = ""
+    STRIPE_WEBHOOK_SECRET: str = ""
+    STRIPE_PRICE_STARTER: str = ""  # Stripe Price ID for starter plan
+    STRIPE_PRICE_PRO: str = ""      # Stripe Price ID for pro plan
+    STRIPE_PRICE_ENTERPRISE: str = ""  # Stripe Price ID for enterprise plan
+    FRONTEND_URL: str = "http://localhost:3000"
+
+    # ── Rate Limiting ─────────────────────────────────────────────────────
+    RATE_LIMIT_PER_MINUTE: int = 60
+
 
 settings = Settings()  # type: ignore[call-arg]

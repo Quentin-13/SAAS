@@ -9,6 +9,8 @@ interface AuthState {
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
   loginDemo: () => void;
+  /** Try a real backend login with demo admin creds; falls back to demo mode on failure. */
+  loginAsAdmin: () => Promise<void>;
   register: (data: { email: string; password: string; full_name: string; organization_name: string }) => Promise<void>;
   logout: () => void;
   fetchUser: () => Promise<void>;
@@ -28,7 +30,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const user = await getUser();
       set({ user, isAuthenticated: true, isLoading: false });
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Échec de la connexion";
+      const message = err instanceof Error ? err.message : "Echec de la connexion";
       set({ error: message, isLoading: false });
       throw err;
     }
@@ -39,6 +41,20 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ user: DEMO_USER, isAuthenticated: true, isLoading: false });
   },
 
+  loginAsAdmin: async () => {
+    // Try real backend login first, then fall back to demo mode
+    set({ isLoading: true, error: null });
+    try {
+      await authLogin("demo@energy-autopilot.fr", "demo1234");
+      const user = await getUser();
+      set({ user, isAuthenticated: true, isLoading: false });
+    } catch {
+      // Backend unavailable — fall back to demo mode
+      enableDemoMode();
+      set({ user: DEMO_USER, isAuthenticated: true, isLoading: false });
+    }
+  },
+
   register: async (data) => {
     set({ isLoading: true, error: null });
     try {
@@ -46,7 +62,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const user = await getUser();
       set({ user, isAuthenticated: true, isLoading: false });
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Échec de l'inscription";
+      const message = err instanceof Error ? err.message : "Echec de l'inscription";
       set({ error: message, isLoading: false });
       throw err;
     }
