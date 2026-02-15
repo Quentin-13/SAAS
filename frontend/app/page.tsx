@@ -9,6 +9,7 @@ import dynamic from "next/dynamic";
 import Testimonials from "@/components/landing/Testimonials";
 import Calculette from "@/components/landing/Calculette";
 import FAQ from "@/components/landing/FAQ";
+import Pricing from "@/components/landing/Pricing";
 import StickyCTA from "@/components/landing/StickyCTA";
 
 const GraphComparison = dynamic(
@@ -54,6 +55,12 @@ export default function LandingPage() {
               className="text-sm text-muted-foreground hover:text-foreground transition"
             >
               Calculette
+            </a>
+            <a
+              href="#tarifs"
+              className="text-sm text-muted-foreground hover:text-foreground transition"
+            >
+              Tarifs
             </a>
             <a
               href="#faq"
@@ -133,10 +140,9 @@ export default function LandingPage() {
           </div>
 
           {/* Stats rapides */}
-          <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
+          <div className="mt-14 grid grid-cols-3 gap-6 max-w-3xl mx-auto">
             {[
               { value: "18-25 %", label: "d\u2019économies moyennes" },
-              { value: "< 9 mois", label: "retour sur investissement" },
               { value: "15 min", label: "fréquence d\u2019optimisation" },
               { value: "1 clic", label: "déclaration OPERAT" },
             ].map((stat) => (
@@ -230,6 +236,9 @@ export default function LandingPage() {
 
       {/* Calculette */}
       <Calculette />
+
+      {/* Tarifs */}
+      <Pricing />
 
       {/* FAQ */}
       <FAQ />
