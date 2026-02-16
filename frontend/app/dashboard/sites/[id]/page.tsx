@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -95,9 +95,27 @@ const DEMO_DEVICES: Device[] = [
   { id: "demo-dev-3", name: "Nest Bureau Direction", device_type: "thermostat", brand: "nest", status: "connected" },
 ];
 
+/** Handles OAuth callback search params without causing Suspense on the parent */
+function OAuthCallbackHandler({ siteId }: { siteId: string }) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const oauthStatus = searchParams.get("oauth");
+    const provider = searchParams.get("provider") || "";
+    if (oauthStatus === "success") {
+      toast.success(`${provider.charAt(0).toUpperCase() + provider.slice(1)} connecté avec succès !`);
+      window.history.replaceState({}, "", `/dashboard/sites/${siteId}`);
+    } else if (oauthStatus === "error") {
+      toast.error(`Erreur de connexion ${provider}. Veuillez réessayer.`);
+      window.history.replaceState({}, "", `/dashboard/sites/${siteId}`);
+    }
+  }, [searchParams, siteId]);
+
+  return null;
+}
+
 export default function SiteDetailPage() {
   const params = useParams();
-  const searchParams = useSearchParams();
   const siteId = params.id as string;
   const { currentSite, isLoading, error, fetchSite, toggleAutopilot } = useSitesStore();
 
@@ -110,20 +128,6 @@ export default function SiteDetailPage() {
     device_type: "linky",
     description: "",
   });
-
-  // Handle OAuth callback query params (?oauth=success&provider=enedis)
-  useEffect(() => {
-    const oauthStatus = searchParams.get("oauth");
-    const provider = searchParams.get("provider") || "";
-    if (oauthStatus === "success") {
-      toast.success(`${provider.charAt(0).toUpperCase() + provider.slice(1)} connecté avec succès !`);
-      // Clean up URL params
-      window.history.replaceState({}, "", `/dashboard/sites/${siteId}`);
-    } else if (oauthStatus === "error") {
-      toast.error(`Erreur de connexion ${provider}. Veuillez réessayer.`);
-      window.history.replaceState({}, "", `/dashboard/sites/${siteId}`);
-    }
-  }, [searchParams, siteId]);
 
   useEffect(() => {
     fetchSite(siteId);
@@ -247,6 +251,11 @@ export default function SiteDetailPage() {
 
   return (
     <div className="space-y-6">
+      {/* OAuth callback handler (wrapped in Suspense to avoid blocking render) */}
+      <Suspense fallback={null}>
+        <OAuthCallbackHandler siteId={siteId} />
+      </Suspense>
+
       {/* Header du site */}
       <div className="flex items-start justify-between">
         <div>
