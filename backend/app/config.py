@@ -76,6 +76,8 @@ class Settings(BaseSettings):
     MOCK_APIS: bool = True  # When True, external calls return fake data
 
     ENEDIS_API_KEY: str = ""
+    ENEDIS_CLIENT_ID: str = ""
+    ENEDIS_CLIENT_SECRET: str = ""
     ENEDIS_API_BASE_URL: str = "https://ext.hml.api.enedis.fr"
 
     NEST_CLIENT_ID: str = ""
@@ -84,6 +86,9 @@ class Settings(BaseSettings):
 
     NETATMO_CLIENT_ID: str = ""
     NETATMO_CLIENT_SECRET: str = ""
+
+    # ── OAuth / public URL ───────────────────────────────────────────────
+    BASE_URL: str = "http://localhost:8000"
 
     OPENWEATHER_API_KEY: str = ""
 

@@ -160,6 +160,7 @@ from app.api.v1.autopilot import router as autopilot_router
 from app.api.v1.dashboard import router as dashboard_router
 from app.api.v1.admin import router as admin_router
 from app.api.v1.billing import router as billing_router
+from app.api.v1.oauth import router as oauth_router
 
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(sites_router, prefix="/api/v1")
@@ -169,6 +170,7 @@ app.include_router(autopilot_router, prefix="/api/v1")
 app.include_router(dashboard_router, prefix="/api/v1")
 app.include_router(admin_router, prefix="/api/v1")
 app.include_router(billing_router, prefix="/api/v1")
+app.include_router(oauth_router, prefix="/api/v1")
 
 
 @app.get("/health", tags=["system"])

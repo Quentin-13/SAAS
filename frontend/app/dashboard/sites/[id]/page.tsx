@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -50,9 +50,9 @@ const DEVICE_TYPE_LABELS: Record<string, string> = {
 };
 
 const OAUTH_ROUTES: Record<string, string> = {
-  linky: "/api/auth/enedis/start",
-  netatmo: "/api/auth/netatmo/start",
-  nest: "/api/auth/nest/start",
+  linky: "/api/v1/auth/enedis/start",
+  netatmo: "/api/v1/auth/netatmo/start",
+  nest: "/api/v1/auth/nest/start",
 };
 
 function getDeviceIcon(type: string) {
@@ -97,6 +97,7 @@ const DEMO_DEVICES: Device[] = [
 
 export default function SiteDetailPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const siteId = params.id as string;
   const { currentSite, isLoading, error, fetchSite, toggleAutopilot } = useSitesStore();
 
@@ -109,6 +110,20 @@ export default function SiteDetailPage() {
     device_type: "linky",
     description: "",
   });
+
+  // Handle OAuth callback query params (?oauth=success&provider=enedis)
+  useEffect(() => {
+    const oauthStatus = searchParams.get("oauth");
+    const provider = searchParams.get("provider") || "";
+    if (oauthStatus === "success") {
+      toast.success(`${provider.charAt(0).toUpperCase() + provider.slice(1)} connecté avec succès !`);
+      // Clean up URL params
+      window.history.replaceState({}, "", `/dashboard/sites/${siteId}`);
+    } else if (oauthStatus === "error") {
+      toast.error(`Erreur de connexion ${provider}. Veuillez réessayer.`);
+      window.history.replaceState({}, "", `/dashboard/sites/${siteId}`);
+    }
+  }, [searchParams, siteId]);
 
   useEffect(() => {
     fetchSite(siteId);
@@ -158,9 +173,24 @@ export default function SiteDetailPage() {
         return;
       }
 
-      // Real OAuth: redirect to backend
-      const redirectUrl = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}${oauthRoute}?site_id=${siteId}&device_name=${encodeURIComponent(form.name)}`;
-      window.location.href = redirectUrl;
+      // Real OAuth: call backend /start endpoint then redirect
+      try {
+        const res = await api.get(`${oauthRoute}?site_id=${siteId}&device_name=${encodeURIComponent(form.name)}`);
+        const { redirect_url, mock } = res.data;
+        if (mock) {
+          // Mock mode: device already created server-side, just reload
+          toast.success("Équipement connecté avec succès !");
+          setForm({ name: "", device_type: "linky", description: "" });
+          setModalOpen(false);
+          setSubmitting(false);
+          loadDevices();
+          return;
+        }
+        window.location.href = redirect_url;
+      } catch {
+        toast.error("Erreur lors de l'initialisation OAuth.");
+        setSubmitting(false);
+      }
       return;
     }
 
