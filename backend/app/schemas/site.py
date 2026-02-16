@@ -50,6 +50,7 @@ class SiteResponse(BaseModel):
     longitude: Optional[float] = None
     surface_area: Optional[int] = None
     building_type: Optional[str] = None
+    autopilot_enabled: bool = False
     zones_count: Optional[int] = None
     devices_count: Optional[int] = None
     created_at: datetime

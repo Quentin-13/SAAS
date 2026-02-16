@@ -1,9 +1,12 @@
 """Site and zone management endpoints."""
 
+import logging
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
+
+logger = logging.getLogger(__name__)
 
 from app.api.deps import get_current_active_user, get_db
 from app.models.site import Site, Zone
@@ -26,8 +29,10 @@ def _get_site_or_404(site_id: str, user: User, db: Session) -> Site:
     """Fetch a site and verify the current user owns it (via org)."""
     site = db.query(Site).filter(Site.id == site_id).first()
     if not site:
+        logger.warning("Site %s not found", site_id)
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Site not found")
     if site.organization_id != user.organization_id:
+        logger.warning("User %s not authorized for site %s", user.id, site_id)
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to access this site")
     return site
 
@@ -41,10 +46,12 @@ def _site_to_response(site: Site) -> SiteResponse:
         address=site.address,
         postal_code=site.postal_code,
         city=site.city,
+        country=site.country or "FR",
         latitude=site.latitude,
         longitude=site.longitude,
         surface_area=site.surface_area,
         building_type=site.building_type,
+        autopilot_enabled=site.autopilot_enabled,
         zones_count=len(site.zones) if site.zones else 0,
         devices_count=len(site.devices) if site.devices else 0,
         created_at=site.created_at,
