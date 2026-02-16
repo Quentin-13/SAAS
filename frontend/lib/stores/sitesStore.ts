@@ -53,6 +53,12 @@ export const useSitesStore = create<SitesState>((set, get) => ({
   },
 
   fetchSite: async (id) => {
+    if (isDemoMode()) {
+      const demoSites = getDemoSites();
+      const site = demoSites.find((s) => s.id === id) || null;
+      set({ currentSite: site, isLoading: false, error: site ? null : "Site non trouvé" });
+      return;
+    }
     set({ isLoading: true });
     try {
       const response = await api.get(`/sites/${id}`);

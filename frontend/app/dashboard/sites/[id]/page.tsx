@@ -98,7 +98,7 @@ const DEMO_DEVICES: Device[] = [
 export default function SiteDetailPage() {
   const params = useParams();
   const siteId = params.id as string;
-  const { currentSite, isLoading, fetchSite, toggleAutopilot } = useSitesStore();
+  const { currentSite, isLoading, error, fetchSite, toggleAutopilot } = useSitesStore();
 
   const [devices, setDevices] = useState<Device[]>([]);
   const [devicesLoading, setDevicesLoading] = useState(false);
@@ -196,10 +196,21 @@ export default function SiteDetailPage() {
     }
   }
 
-  if (isLoading || !currentSite) {
+  if (isLoading) {
     return (
       <div className="flex justify-center py-12">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!currentSite) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 space-y-4">
+        <p className="text-lg text-muted-foreground">{error || "Site introuvable."}</p>
+        <Button variant="outline" onClick={() => window.history.back()}>
+          Retour
+        </Button>
       </div>
     );
   }
