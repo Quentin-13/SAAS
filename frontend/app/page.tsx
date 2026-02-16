@@ -110,31 +110,30 @@ export default function LandingPage() {
 
           {/* Headline */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
-            Factures énergétiques qui explosent et pénalités ADEME en vue ?{" "}
+            Réduisez votre facture énergétique de 15 à 25&nbsp;% dès les premiers mois{" "}
             <span className="text-primary">
-              Respectez le décret tertiaire 2030 sans travaux ni stress
-            </span>{" "}
-            – Automatiquement.
+              – sans travaux ni stress
+            </span>
           </h1>
 
           {/* Sous-titre */}
           <p className="mt-6 md:mt-8 text-base md:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            L&apos;autopilot IA optimise votre conso Linky + thermostats toutes
-            les 15 min : heures creuses, occupation intelligente, prévisions
-            météo. Économies moyennes 18-25 % sur Ehpad, hôtels et bureaux
-            tertiaires &gt;1 000 m². Déclaration OPERAT générée en 1 clic.
+            Autopilot IA qui optimise Linky + thermostats toutes les 15&nbsp;min :
+            heures creuses, occupation réelle, prévisions météo. Économies moyennes
+            18–25&nbsp;% prouvées sur Ehpad, hôtels et bureaux tertiaires &gt;1&nbsp;000&nbsp;m².
+            Conforme décret tertiaire et OPERAT simplifié.
           </p>
 
           {/* CTAs */}
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/register">
-              <Button size="lg" className="text-base px-8 py-6 h-auto">
-                Demander un pilote gratuit 60 jours sur mon bâtiment
+              <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white text-base px-8 py-6 h-auto">
+                Obtenir un pilote gratuit 60 jours
               </Button>
             </Link>
             <a href="#calculette">
               <Button variant="outline" size="lg" className="text-base px-8 py-6 h-auto">
-                Calculer mes économies en 30s
+                Calculer mes économies en 30 secondes
               </Button>
             </a>
           </div>
