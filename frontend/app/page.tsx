@@ -12,8 +12,8 @@ import FAQ from "@/components/landing/FAQ";
 import Pricing from "@/components/landing/Pricing";
 import StickyCTA from "@/components/landing/StickyCTA";
 
-const GraphComparison = dynamic(
-  () => import("@/components/landing/GraphComparison"),
+const EtudeDeCas = dynamic(
+  () => import("@/components/landing/EtudeDeCas"),
   { ssr: false }
 );
 
@@ -228,8 +228,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Graphique de comparaison */}
-      <GraphComparison />
+      {/* Étude de cas */}
+      <EtudeDeCas />
 
       {/* Preuves sociales */}
       <Testimonials />
